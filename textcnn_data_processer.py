@@ -37,11 +37,12 @@ class TextCNNDataProcessor:
         """
         text_field = data.Field(sequential=True, tokenize=get_text_tokenize, lower=True)
         label_field = data.Field(sequential=False, use_vocab=False)
+        image_field = data.Field(sequential=False, use_vocab=False)
 
         # 读取数据并根据定义的字段加载数据
         train, val, test = data.TabularDataset.splits(
             path='./list', train='train.csv', validation='val.csv', test='test.csv', format='csv', skip_header=True,
-            fields=[('', None), ('index', None), ('image', None), ('text', text_field), ('label', label_field)]
+            fields=[('', None), ('index', None), ('image', image_field), ('text', text_field), ('label', label_field)]
         )
 
         # 加载并构建静态词向量表

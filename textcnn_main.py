@@ -1,30 +1,11 @@
 import torch
 import argparse
 
+from init_seeds import Seeds
 from textcnn_model import TextCNN
 from textcnn_data_processer import TextCNNDataProcessor
 from textcnn_trainer import TextCNNTrainer
 from textcnn_data_feature import TextCNNDataFeature
-import random
-import numpy as np
-from torch.backends import cudnn
-
-
-def init_seeds(seed=0):
-    torch.manual_seed(seed)             # set the seed for generating random numbers
-    torch.cuda.manual_seed(seed)        # set the seed for generating random numbers for the current GPU
-    torch.cuda.manual_seed_all(seed)    # set the seed for generating random numbers on all GPUs
-    random.seed(seed)
-    np.random.seed(seed)
-
-    if seed == 0:                       # cudnn中对卷积操作进行了优化，牺牲了精度来换取计算效率
-        cudnn.deterministic = True      # 不过实际上这个设置对精度影响不大，仅仅是小数点后几位的差别
-        cudnn.benchmark = False         # 如果不是对精度要求极高，其实不太建议修改，因为会使计算效率降低
-
-
-init_seeds(1)
-
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 parser = argparse.ArgumentParser(description='TextCNN text classifier')
 
@@ -53,17 +34,21 @@ args = parser.parse_args()
 
 
 if __name__ == '__main__':
+    seeds = Seeds()
+    seeds.init_seeds()
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print('torch.cuda.is_available(): ', torch.cuda.is_available())
 
     print('1.正在加载数据...')
-    processor = TextCNNDataProcessor(DEVICE, args)
+    processor = TextCNNDataProcessor(device, args)
     train_iter, val_iter, test_iter = processor.load_data()
     args.vocab_size, args.embedding_dim, args.label_num = processor.get_args()
     args.vectors = processor.get_build_vocab()
     print('\n加载数据完成！\n')
 
     print('2.正在加载模型...')
-    model = TextCNN(args).to(DEVICE)
+    model = TextCNN(args).to(device)
     print('\n加载模型完成！\n')
 
     print('3.开始训练模型...')

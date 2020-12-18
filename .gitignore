@@ -10,7 +10,7 @@ sentence/*
 !.keep
 
 # vector cache
-vector_cache/
+.vector_cache/
 
 # model cache
 model_dir/
