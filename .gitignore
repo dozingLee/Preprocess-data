@@ -1,0 +1,19 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# PyBuilder
+target/
+.idea
+dataset/*
+sentence/*
+!.keep
+
+# vector cache
+vector_cache/
+
+# model cache
+model_dir/
+
+# feature cache
+feature_dir/
