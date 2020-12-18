@@ -123,8 +123,10 @@ if __name__ == "__main__":
     dataset.download_images()
     # download sentences
     dataset.download_sentences()
-    # create correspondence data by dataset
-    dataset.create_correspondence_data()
+
+    # # create correspondence data by dataset
+    # dataset.create_correspondence_data()
+
     # create my pair data
     dataset.create_pair_data()
     # preprocess data

@@ -1,7 +1,7 @@
 import torch
 from PIL import Image
 from init_seeds import Seeds
-from vgg_model import VGG
+from vgg_model_feature import VGG
 import pandas as pd
 
 if __name__ == '__main__':
