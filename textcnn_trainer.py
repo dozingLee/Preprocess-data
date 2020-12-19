@@ -7,6 +7,7 @@ import sys
 class TextCNNTrainer:
     def __init__(self, args):
         super(TextCNNTrainer, self).__init__()
+
         self.lr = args.lr
         self.epoch = args.epoch
         self.log_interval = args.log_interval

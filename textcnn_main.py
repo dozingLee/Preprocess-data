@@ -2,10 +2,10 @@ import torch
 import argparse
 
 from init_seeds import Seeds
+from model_feature import GeneratePairsFeature
 from textcnn_model import TextCNN
 from textcnn_data_processer import TextCNNDataProcessor
 from textcnn_trainer import TextCNNTrainer
-from textcnn_data_feature import TextCNNDataFeature
 
 parser = argparse.ArgumentParser(description='TextCNN text classifier')
 
@@ -22,7 +22,7 @@ parser.add_argument('-label-num', type=int, default=20, help='标签个数（可
 parser.add_argument('-embedding-dim', type=int, default=300, help='词向量的维度（预训练词向量可自动获取）')
 parser.add_argument('-fine-tune', type=bool, default=True, help='预训练词向量是否要微调，不需要微调设置为True')
 
-# parser.add_argument('-cuda', type=bool, default=True, help='是否使用GPU')
+parser.add_argument('-disable-cuda', type=bool, default=False, help='是否禁用GPU')
 parser.add_argument('-log-interval', type=int, default=1, help='经过多少iteration记录一次训练状态')
 parser.add_argument('-test-interval', type=int, default=50, help='经过多少iteration对验证集进行测试')
 parser.add_argument('-early-stopping', type=int, default=1000, help='早停时迭代的次数')
@@ -37,11 +37,18 @@ if __name__ == '__main__':
     seeds = Seeds()
     seeds.init_seeds()
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print('0.加载可用设备...')
+    if not args.disable_cuda and torch.cuda.is_available():
+        device = torch.device('cuda')
+    else:
+        device = torch.device('cpu')
+    args.device = device
+    print('args.disable_cuda: ', args.disable_cuda)
     print('torch.cuda.is_available(): ', torch.cuda.is_available())
+    print('\n0.使用设备名称：{}\n'.format(device))
 
     print('1.正在加载数据...')
-    processor = TextCNNDataProcessor(device, args)
+    processor = TextCNNDataProcessor(args)
     train_iter, val_iter, test_iter = processor.load_data()
     args.vocab_size, args.embedding_dim, args.label_num = processor.get_args()
     args.vectors = processor.get_build_vocab()
@@ -61,6 +68,6 @@ if __name__ == '__main__':
     print('\n测试模型完成！\n')
 
     print('5.获取特征...')
-    feature_extractor = TextCNNDataFeature(model, args)
+    feature_extractor = GeneratePairsFeature(image_model_type='vgg19', text_model_type=model, args=args)
     feature_extractor.save_features_labels(train_iter, val_iter, test_iter)
     print('\n获取特征完成！\n')

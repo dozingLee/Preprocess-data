@@ -12,10 +12,10 @@ def get_text_tokenize(text_file):
 
 
 class TextCNNDataProcessor:
-    def __init__(self, device, args):
+    def __init__(self, args):
         super(TextCNNDataProcessor, self).__init__()
 
-        self.device = device  # 可用设备
+        self.device = args.device  # 可用设备
 
         self.batch_size = args.batch_size  # batch大小
 
@@ -37,7 +37,7 @@ class TextCNNDataProcessor:
         """
         text_field = data.Field(sequential=True, tokenize=get_text_tokenize, lower=True)
         label_field = data.Field(sequential=False, use_vocab=False)
-        image_field = data.Field(sequential=False, use_vocab=False)
+        image_field = data.Field(sequential=False)
 
         # 读取数据并根据定义的字段加载数据
         train, val, test = data.TabularDataset.splits(
@@ -57,6 +57,8 @@ class TextCNNDataProcessor:
         # 标签build后：对于无标签<unk>为0，有标签0和1在build之后分别为1和2
         # 后续使用标签：在后面训练模型时标签减1相对应
         label_field.build_vocab(train, val, test)
+
+        image_field.build_vocab(train, val, test)
 
         # 构建batch大小的数据集
         '''
